@@ -46,9 +46,9 @@
   "author": "le-ar <malmuk2013@gmail.com> (https://github.com/le-ar)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/le-ar/react-native-autoscroll/issues"
+    "url": "https://github.com/procraft/react-native-autoscroll/issues"
   },
-  "homepage": "https://github.com/le-ar/react-native-autoscroll#readme",
+  "homepage": "https://github.com/procraft/react-native-autoscroll#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -70,6 +70,8 @@
     "react": "18.2.0",
     "react-native": "0.72.6",
     "react-native-builder-bob": "^0.20.0",
+    "react-native-gesture-handler": "~2.12.0",
+    "react-native-reanimated": "^3.5.0",
     "release-it": "^15.0.0",
     "typescript": "^5.0.2"
   },
@@ -78,7 +80,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*"
   },
   "workspaces": [
     "example"
