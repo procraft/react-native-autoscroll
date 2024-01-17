@@ -41,12 +41,12 @@ export function checkCollision(a: MeasuredDimensions, b: MeasuredDimensions) {
   );
 }
 
-export function calcSpeed(offset: number, delta: number) {
-  'worklet';
-  return minMax(0, 0, easeInExpo((offset + delta) / delta));
-}
-
 export function minMax(min: number, max: number, value: number) {
   'worklet';
   return Math.min(max, Math.max(min, value));
+}
+
+export function calcSpeed(offset: number, delta: number) {
+  'worklet';
+  return minMax(0, 1, easeInExpo((offset + delta) / delta));
 }
