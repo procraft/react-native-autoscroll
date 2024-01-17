@@ -7,7 +7,7 @@ import {
   AutoScrollContext,
   AutoScrollContextRootProvider,
   AutoScrollScrollView,
-} from 'react-native-autoscroll';
+} from '@procraft/react-native-autoscroll';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function App() {

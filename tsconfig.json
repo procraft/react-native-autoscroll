@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-autoscroll": ["./src/index"]
+      "@procraft/react-native-autoscroll": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
