@@ -1,5 +1,5 @@
 {
-  "name": "react-native-autoscroll",
+  "name": "@procraft/react-native-autoscroll",
   "version": "0.1.0",
   "description": "autoscroll library for react native",
   "main": "lib/commonjs/index",
@@ -41,7 +41,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/le-ar/react-native-autoscroll.git"
+    "url": "git+https://github.com/procraft/react-native-autoscroll.git"
   },
   "author": "le-ar <malmuk2013@gmail.com> (https://github.com/le-ar)",
   "license": "MIT",
@@ -109,7 +109,8 @@
       "tagName": "v${version}"
     },
     "npm": {
-      "publish": true
+      "publish": true,
+      "publishArgs": ["--access=public"]
     },
     "github": {
       "release": true
