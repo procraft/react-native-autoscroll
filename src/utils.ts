@@ -37,7 +37,7 @@ export function checkCollision(a: MeasuredDimensions, b: MeasuredDimensions) {
     a.pageX < b.pageX + b.width &&
     a.pageX + a.width > b.pageX &&
     a.pageY < b.pageY + b.height &&
-    a.pageY + a.height < b.pageY
+    a.pageY + a.height > b.pageY
   );
 }
 
