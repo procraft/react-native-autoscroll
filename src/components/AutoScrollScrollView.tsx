@@ -21,6 +21,7 @@ import {
 } from '../contexts/AutoScrollContext';
 import {
   getOffset,
+  type AutoScrollBy,
   type AutoScrollHandler,
 } from '../handlers/AutoScrollHandler';
 import { useAutoScroll } from '../hooks/useAutoScroll';
@@ -35,9 +36,17 @@ export interface ScrollAnimInfo {
 export function AutoScrollScrollView(
   props: Omit<ComponentProps<ScrollView>, 'ref'> & {
     innerRef?: AnimatedRef<Animated.ScrollView>;
+    manualActivate?: boolean;
+    manualScrollBy?: AutoScrollBy<number>;
   }
 ) {
-  const { innerRef, horizontal: horizontalProps, ...otherProps } = props;
+  const {
+    innerRef,
+    horizontal: horizontalProps,
+    manualActivate,
+    manualScrollBy,
+    ...otherProps
+  } = props;
 
   const horizontal = useSharedValue(horizontalProps);
   const handlerId = useSharedValue<number>(-1);
@@ -143,6 +152,7 @@ export function AutoScrollScrollView(
     }
   }, [scrollAnimInfo, scrollHandler, scrollContentSize, scrollSize]);
 
+  const autoStart = manualActivate === true && manualScrollBy != null;
   const {
     id,
     startScrollRoot,
@@ -156,8 +166,27 @@ export function AutoScrollScrollView(
     scrollToLocal,
     startScroll,
     stopScroll,
-    needScroll
+    needScroll,
+    autoStart,
+    manualActivate
   );
+
+  useDerivedValue(() => {
+    'worklet';
+    if (manualActivate) {
+      if (manualScrollBy == null) {
+        stopScroll();
+      } else {
+        const scrollByLocal: AutoScrollBy =
+          typeof manualScrollBy === 'number'
+            ? { id, speed: manualScrollBy }
+            : manualScrollBy;
+        startScroll(scrollByLocal, () => {
+          'worklet';
+        });
+      }
+    }
+  }, [id, manualActivate, manualScrollBy, startScroll, stopScroll]);
 
   useEffect(() => {
     handlerId.value = id;

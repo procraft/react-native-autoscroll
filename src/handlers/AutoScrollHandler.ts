@@ -51,7 +51,7 @@ export function getOffsetById(
   }
   return {
     x: horizontal ? scrollBy.speed : 0,
-    y: horizontal ? scrollBy.speed : 0,
+    y: horizontal ? 0 : scrollBy.speed,
   };
 }
 

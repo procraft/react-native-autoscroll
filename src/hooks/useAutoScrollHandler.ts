@@ -5,7 +5,8 @@ import type { AutoScrollHandler } from '../handlers';
 export function useAutoScrollHandler(
   startScroll: AutoScrollHandler['startScroll'],
   stopScroll: AutoScrollHandler['stopScroll'],
-  needScroll: AutoScrollHandler['needScroll']
+  needScroll: AutoScrollHandler['needScroll'],
+  manualActivate?: boolean
 ) {
   const {
     id: parentId,
@@ -25,15 +26,22 @@ export function useAutoScrollHandler(
   );
 
   const id = useMemo(
-    () => registerScrollRoot(handler, parentId),
+    () => {
+      if (manualActivate) {
+        return -1;
+      }
+      return registerScrollRoot(handler, parentId);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [handler, parentId, registerScrollRoot, removeScrollRoot]
+    [handler, parentId, manualActivate, registerScrollRoot, removeScrollRoot]
   );
   useEffect(
     () => () => {
-      removeScrollRoot(id);
+      if (!manualActivate) {
+        removeScrollRoot(id);
+      }
     },
-    [id, handler, parentId, registerScrollRoot, removeScrollRoot]
+    [id, manualActivate, removeScrollRoot]
   );
 
   return {

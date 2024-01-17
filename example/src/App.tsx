@@ -4,52 +4,63 @@ import { useContext, useState } from 'react';
 
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import {
-  useAutoScrollAnim,
-  type Offset,
-  useAutoScrollHandler,
+  AutoScrollContext,
   AutoScrollContextRootProvider,
   AutoScrollScrollView,
-  AutoScrollContext,
 } from 'react-native-autoscroll';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useSharedValue } from 'react-native-reanimated';
 
 export default function App() {
   const [items] = useState(() =>
     Array.from({ length: 50 }).map((_, i) => ({
-      id: i,
-      text: Array.from({ length: i })
-        .map(() => i.toString())
+      id: i + 1,
+      text: Array.from({ length: i + 1 })
+        .map(() => (i + 1).toString())
         .join(' | '),
     }))
   );
 
-  const isActive = useSharedValue(false);
-  const scrollOffset = useSharedValue<Offset>({ x: 0, y: 0 });
-  const scrollSpeed = useSharedValue(null);
-  useAutoScrollAnim(isActive, scrollOffset, scrollSpeed, () => {
-    'worklet';
-  });
-
-  useAutoScrollHandler(
-    () => {},
-    () => {},
-    () => false
-  );
+  const [scrollOffset, setScrollOffset] = useState<number | null>(100);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutoScrollContextRootProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <View style={styles.container}>
-            <View>
-              <Pressable>
-                <Text>Start</Text>
+            <View
+              style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                marginBottom: 8,
+              }}
+            >
+              <Pressable
+                style={styles.button}
+                onPress={() => setScrollOffset(100)}
+              >
+                <Text>Scroll To Bottom</Text>
+              </Pressable>
+              <Pressable
+                style={styles.button}
+                onPress={() => setScrollOffset(-100)}
+              >
+                <Text>Scroll To Top</Text>
+              </Pressable>
+              <Pressable
+                style={styles.button}
+                onPress={() => setScrollOffset(null)}
+              >
+                <Text>Stop Scroll</Text>
               </Pressable>
             </View>
-            <AutoScrollScrollView style={styles.scroll}>
+            <AutoScrollScrollView
+              style={styles.scroll}
+              manualActivate
+              manualScrollBy={scrollOffset}
+            >
               {items.map((item) => (
-                <Item key={item.id} text={item.text} />
+                <ItemMemo key={item.id} text={item.text} />
               ))}
             </AutoScrollScrollView>
           </View>
@@ -90,6 +101,8 @@ function Item(props: ItemProps) {
   );
 }
 
+const ItemMemo = React.memo(Item);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -102,6 +115,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
+  },
+  button: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    marginHorizontal: 4,
   },
   box: {
     width: 60,

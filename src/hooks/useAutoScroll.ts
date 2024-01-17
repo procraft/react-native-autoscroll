@@ -11,7 +11,9 @@ export function useAutoScroll(
   scrollTo: (offset: Offset) => void,
   startScroll: AutoScrollHandler['startScroll'],
   stopScroll: AutoScrollHandler['stopScroll'],
-  needScroll: AutoScrollHandler['needScroll']
+  needScroll: AutoScrollHandler['needScroll'],
+  autoStart: boolean,
+  manualActivate?: boolean
 ) {
   const {
     id,
@@ -19,13 +21,14 @@ export function useAutoScroll(
     removeScrollRoot,
     startScrollRoot,
     stopScrollRoot,
-  } = useAutoScrollHandler(startScroll, stopScroll, needScroll);
+  } = useAutoScrollHandler(startScroll, stopScroll, needScroll, manualActivate);
 
   const { scrollAnim } = useAutoScrollAnim(
     isActive,
     scrollOffset,
     scrollSpeed,
-    scrollTo
+    scrollTo,
+    autoStart
   );
 
   return {
