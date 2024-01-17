@@ -157,18 +157,15 @@ export function AutoScrollContextRootProvider(
       };
     },
     ({ ids, idsMap, scrollBy: scrollByLocal }, prevValue) => {
-      console.log('REACTION SET 1');
       const prevIds = prevValue?.ids ?? [];
       for (const id of prevIds) {
         if (idsMap[id] !== true) {
           handlers.value[id]?.stopScroll();
         }
       }
-      console.log('REACTION SET 2');
       for (const id of ids) {
         handlers.value[id]?.startScroll(scrollByLocal, updateScrollBy);
       }
-      console.log('REACTION SET 3');
     },
     [handlers, scrollBy, collectItems, updateScrollBy]
   );
