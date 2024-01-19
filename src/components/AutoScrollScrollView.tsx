@@ -64,7 +64,6 @@ export function AutoScrollScrollView(
   const needScroll = useCallback<AutoScrollHandler['needScroll']>(
     (scrollBy) => {
       'worklet';
-
       const measurement = measure(scrollRef);
       const offset = getOffset(
         scrollBy,

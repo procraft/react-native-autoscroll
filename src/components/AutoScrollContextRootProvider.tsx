@@ -102,7 +102,9 @@ export function AutoScrollContextRootProvider(
   );
 
   const removeScroll = useCallback<AutoScrollContextType['removeScroll']>(
-    (id) => removeHandler(handlers, handlersTree, id),
+    (id) => {
+      removeHandler(handlers, handlersTree, id);
+    },
     [handlers, handlersTree]
   );
 

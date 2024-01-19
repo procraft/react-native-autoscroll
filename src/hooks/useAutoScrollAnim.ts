@@ -5,7 +5,7 @@ import {
   useFrameCallback,
   type SharedValue,
 } from 'react-native-reanimated';
-import type { Offset } from '../utils';
+import { type Offset } from '../utils';
 
 export function useAutoScrollAnim(
   isActive: SharedValue<boolean>,
@@ -17,10 +17,9 @@ export function useAutoScrollAnim(
   const scrollAnim = useFrameCallback(
     ({ timeSincePreviousFrame: deltaTime }) => {
       'worklet';
-      if (deltaTime == null || scrollSpeed.value == null) {
+      if (deltaTime == null || deltaTime < 0 || scrollSpeed.value == null) {
         return;
       }
-
       const deltaX = (scrollSpeed.value.x * deltaTime) / 1000;
       const deltaY = (scrollSpeed.value.y * deltaTime) / 1000;
       const offset: Offset = {
@@ -34,7 +33,9 @@ export function useAutoScrollAnim(
 
   const setScrollAnimActive = useCallback(
     (isActiveLocal: boolean) => {
-      scrollAnim.setActive(isActiveLocal);
+      if (!scrollAnim.isActive) {
+        scrollAnim.setActive(isActiveLocal);
+      }
     },
     [scrollAnim]
   );

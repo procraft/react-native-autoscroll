@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import {
@@ -8,7 +8,18 @@ import {
   AutoScrollContextRootProvider,
   AutoScrollScrollView,
 } from '@procraft/react-native-autoscroll';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
+import Animated, {
+  measure,
+  runOnJS,
+  useAnimatedRef,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 
 export default function App() {
   const [items] = useState(() =>
@@ -20,12 +31,20 @@ export default function App() {
     }))
   );
 
-  const [scrollOffset, setScrollOffset] = useState<number | null>(100);
+  const [manualActivate, setManualActivate] = useState(false);
+  const [scrollSpeed, setScrollSpeed] = useState<number | null>(100);
+
+  const setScroll = useCallback((speed: number | null) => {
+    setScrollSpeed(speed);
+    setManualActivate(speed != null);
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AutoScrollContextRootProvider>
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
           <View style={styles.container}>
             <View
               style={{
@@ -35,38 +54,127 @@ export default function App() {
                 marginBottom: 8,
               }}
             >
-              <Pressable
-                style={styles.button}
-                onPress={() => setScrollOffset(100)}
-              >
+              <Pressable style={styles.button} onPress={() => setScroll(100)}>
                 <Text>Scroll To Bottom</Text>
               </Pressable>
-              <Pressable
-                style={styles.button}
-                onPress={() => setScrollOffset(-100)}
-              >
+              <Pressable style={styles.button} onPress={() => setScroll(-100)}>
                 <Text>Scroll To Top</Text>
               </Pressable>
-              <Pressable
-                style={styles.button}
-                onPress={() => setScrollOffset(null)}
-              >
+              <Pressable style={styles.button} onPress={() => setScroll(null)}>
                 <Text>Stop Scroll</Text>
               </Pressable>
             </View>
             <AutoScrollScrollView
               style={styles.scroll}
-              manualActivate
-              manualScrollBy={scrollOffset}
+              manualActivate={manualActivate}
+              manualScrollBy={scrollSpeed}
             >
               {items.map((item) => (
                 <ItemMemo key={item.id} text={item.text} />
               ))}
             </AutoScrollScrollView>
           </View>
+          <MovedItem setScroll={setScroll} />
         </SafeAreaView>
       </AutoScrollContextRootProvider>
     </GestureHandlerRootView>
+  );
+}
+
+interface MovedItemProps {
+  setScroll: (speed: number | null) => void;
+}
+
+function MovedItem(props: MovedItemProps) {
+  const { setScroll } = props;
+
+  const { startScroll, stopScroll } = useContext(AutoScrollContext);
+
+  const animatedRef = useAnimatedRef();
+  const transition = useSharedValue({ x: 0, y: 0 });
+
+  const gesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .onStart(() => {
+          runOnJS(setScroll)(null);
+        })
+        .onChange(({ changeX, changeY }) => {
+          transition.value = {
+            x: transition.value.x + changeX,
+            y: transition.value.y + changeY,
+          };
+
+          const measurement = measure(animatedRef);
+          if (measurement != null) {
+            startScroll({ measurement });
+          }
+        })
+        .onEnd(() => {
+          stopScroll();
+        }),
+    [animatedRef, transition, setScroll, startScroll, stopScroll]
+  );
+
+  const style = useAnimatedStyle(
+    () => ({
+      transform: [
+        { translateX: transition.value.x },
+        { translateY: transition.value.y },
+      ],
+    }),
+    []
+  );
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View
+        ref={animatedRef}
+        style={[
+          {
+            position: 'absolute',
+            width: 100,
+            height: 100,
+            backgroundColor: 'red',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          style,
+        ]}
+      >
+        <Text style={{ position: 'absolute', fontSize: 28, right: 10 }}>⮕</Text>
+        <Text
+          style={{
+            position: 'absolute',
+            fontSize: 28,
+            left: 10,
+            transform: [{ rotate: '180deg' }],
+          }}
+        >
+          ⮕
+        </Text>
+        <Text
+          style={{
+            position: 'absolute',
+            fontSize: 28,
+            bottom: 10,
+            transform: [{ rotate: '90deg' }],
+          }}
+        >
+          ⮕
+        </Text>
+        <Text
+          style={{
+            position: 'absolute',
+            fontSize: 28,
+            top: 10,
+            transform: [{ rotate: '270deg' }],
+          }}
+        >
+          ⮕
+        </Text>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 

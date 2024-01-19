@@ -1,5 +1,5 @@
 import { type MeasuredDimensions } from 'react-native-reanimated';
-import { calcSpeed, checkCollision, type Offset } from '../utils';
+import { calcSpeedAnim, checkCollision, type Offset } from '../utils';
 
 export type AutoScrollByRect = {
   measurement: MeasuredDimensions;
@@ -62,6 +62,7 @@ export function getOffsetByRect(
 ): Offset | null {
   'worklet';
   const itemMeasurement = scrollBy.measurement;
+
   if (
     areaMeasurement == null ||
     !checkCollision(areaMeasurement, scrollBy.measurement)
@@ -78,9 +79,10 @@ export function getOffsetByRect(
 
   const offsetBack = areaTop - itemTop;
   const offsetForward = itemBottom - areaBottom;
+  const areaSize = horizontal ? areaMeasurement.width : areaMeasurement.height;
 
-  const backSpeed = calcSpeed(offsetBack, 60);
-  const forwardSpeed = calcSpeed(offsetForward, 60);
+  const backSpeed = calcSpeedAnim(offsetBack, 60) * areaSize;
+  const forwardSpeed = calcSpeedAnim(offsetForward, 60) * areaSize;
 
   if (backSpeed > 0 || forwardSpeed > 0) {
     const xSpeed = backSpeed > forwardSpeed ? -backSpeed : forwardSpeed;

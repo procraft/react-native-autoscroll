@@ -46,7 +46,7 @@ export function minMax(min: number, max: number, value: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-export function calcSpeed(offset: number, delta: number) {
+export function calcSpeedAnim(offset: number, delta: number) {
   'worklet';
-  return minMax(0, 1, easeInExpo((offset + delta) / delta));
+  return easeInExpo(minMax(0, 1, (offset + delta) / delta));
 }
