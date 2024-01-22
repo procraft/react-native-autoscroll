@@ -4,7 +4,6 @@ import React, {
   useMemo,
   type ComponentProps,
 } from 'react';
-import type { ScrollView } from 'react-native-gesture-handler';
 import Animated, {
   measure,
   scrollTo,
@@ -34,7 +33,7 @@ export interface ScrollAnimInfo {
 }
 
 export function AutoScrollScrollView(
-  props: Omit<ComponentProps<ScrollView>, 'ref'> & {
+  props: Omit<ComponentProps<Animated.ScrollView>, 'ref'> & {
     innerRef?: AnimatedRef<Animated.ScrollView>;
     manualActivate?: boolean;
     manualScrollBy?: AutoScrollBy<number>;
@@ -48,7 +47,16 @@ export function AutoScrollScrollView(
     ...otherProps
   } = props;
 
-  const horizontal = useSharedValue(horizontalProps);
+  const horizontalLocal = useSharedValue(
+    typeof horizontalProps === 'object'
+      ? horizontalProps?.value
+      : horizontalProps
+  );
+  const horizontal =
+    horizontalProps != null && typeof horizontalProps === 'object'
+      ? horizontalProps
+      : horizontalLocal;
+
   const handlerId = useSharedValue<number>(-1);
   const scrollAnimInfo = useSharedValue<ScrollAnimInfo | null>(null);
 
@@ -189,7 +197,9 @@ export function AutoScrollScrollView(
 
   useEffect(() => {
     handlerId.value = id;
-    horizontal.value = horizontalProps;
+    if (typeof horizontalProps !== 'object') {
+      horizontal.value = horizontalProps;
+    }
   }, [id, handlerId, horizontal, horizontalProps]);
 
   const value = useMemo<AutoScrollContextType>(
