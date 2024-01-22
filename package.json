@@ -1,6 +1,6 @@
 {
   "name": "@procraft/react-native-autoscroll",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "autoscroll library for react native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
