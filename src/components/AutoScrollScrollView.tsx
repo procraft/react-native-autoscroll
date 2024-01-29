@@ -114,10 +114,18 @@ export function AutoScrollScrollView(
     scrollAnimInfo.value = null;
   }, [scrollAnimInfo]);
 
-  const scrollToLocal = useCallback(
+  const scrollToInstantly = useCallback(
     (offset: Offset) => {
       'worklet';
       scrollTo(scrollRef, offset.x, offset.y, false);
+    },
+    [scrollRef]
+  );
+  const scrollToAnim = useCallback(
+    (x: number, y: number) => {
+      'worklet';
+
+      scrollTo(scrollRef, x, y, true);
     },
     [scrollRef]
   );
@@ -171,7 +179,7 @@ export function AutoScrollScrollView(
     isScrollAnimActive,
     scrollOffset,
     scrollSpeed,
-    scrollToLocal,
+    scrollToInstantly,
     startScroll,
     stopScroll,
     needScroll,
@@ -203,15 +211,6 @@ export function AutoScrollScrollView(
     }
   }, [id, handlerId, horizontal, horizontalProps]);
 
-  const scrollToLocalJs = useCallback(
-    (x: number, y: number) => {
-      'worklet';
-
-      scrollTo(scrollRef, x, y, true);
-    },
-    [scrollRef]
-  );
-
   const measureLocal = useCallback(() => {
     'worklet';
 
@@ -239,7 +238,7 @@ export function AutoScrollScrollView(
       stopScroll: stopScrollRoot,
       registerScroll: registerScrollRoot,
       removeScroll: removeScrollRoot,
-      scrollTo: scrollToLocalJs,
+      scrollTo: scrollToAnim,
       measure: measureLocal,
       getRelativeCoords: getRelativeCoordsLocal,
     }),
@@ -249,7 +248,7 @@ export function AutoScrollScrollView(
       stopScrollRoot,
       registerScrollRoot,
       removeScrollRoot,
-      scrollToLocalJs,
+      scrollToAnim,
       measureLocal,
       getRelativeCoordsLocal,
     ]
