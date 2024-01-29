@@ -13,6 +13,7 @@ import Animated, {
   useSharedValue,
   type AnimatedRef,
   type MeasuredDimensions,
+  getRelativeCoords,
 } from 'react-native-reanimated';
 import {
   AutoScrollContext,
@@ -202,6 +203,35 @@ export function AutoScrollScrollView(
     }
   }, [id, handlerId, horizontal, horizontalProps]);
 
+  const scrollToLocalJs = useCallback(
+    (x: number, y: number) => {
+      'worklet';
+
+      scrollTo(scrollRef, x, y, true);
+    },
+    [scrollRef]
+  );
+
+  const measureLocal = useCallback(() => {
+    'worklet';
+
+    return measure(scrollRef);
+  }, [scrollRef]);
+
+  const getRelativeCoordsLocal = useCallback(
+    (pageX: number, pageY: number) => {
+      'worklet';
+
+      // @ts-expect-error scrollRef component
+      const coords = getRelativeCoords(scrollRef, pageX, pageY);
+      if (coords) {
+        return { x: coords.x, y: coords.y + scrollHandler.value };
+      }
+      return { x: 0, y: 0 };
+    },
+    [scrollHandler.value, scrollRef]
+  );
+
   const value = useMemo<AutoScrollContextType>(
     () => ({
       id,
@@ -209,8 +239,20 @@ export function AutoScrollScrollView(
       stopScroll: stopScrollRoot,
       registerScroll: registerScrollRoot,
       removeScroll: removeScrollRoot,
+      scrollTo: scrollToLocalJs,
+      measure: measureLocal,
+      getRelativeCoords: getRelativeCoordsLocal,
     }),
-    [id, registerScrollRoot, removeScrollRoot, startScrollRoot, stopScrollRoot]
+    [
+      id,
+      startScrollRoot,
+      stopScrollRoot,
+      registerScrollRoot,
+      removeScrollRoot,
+      scrollToLocalJs,
+      measureLocal,
+      getRelativeCoordsLocal,
+    ]
   );
 
   return (
