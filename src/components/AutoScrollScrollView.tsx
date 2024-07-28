@@ -35,7 +35,9 @@ export interface ScrollAnimInfo {
 
 export function AutoScrollScrollView(
   props: Omit<ComponentProps<Animated.ScrollView>, 'ref'> & {
-    innerRef?: ((ref: Animated.ScrollView) => void) | AnimatedRef<Animated.ScrollView>;
+    innerRef?:
+      | ((ref: Animated.ScrollView) => void)
+      | AnimatedRef<Animated.ScrollView>;
     manualActivate?: boolean;
     manualScrollBy?: AutoScrollBy<number>;
   }
@@ -62,8 +64,14 @@ export function AutoScrollScrollView(
   const scrollAnimInfo = useSharedValue<ScrollAnimInfo | null>(null);
 
   const animatedRef = useAnimatedRef<Animated.ScrollView>();
-  const innerRef = typeof innerRefProps === 'function' && 'current' in innerRefProps ? innerRefProps : void 0
-  const innerRefFn = typeof innerRefProps === 'function' && !('current' in innerRefProps) ? innerRefProps : void 0
+  const innerRef =
+    typeof innerRefProps === 'function' && 'current' in innerRefProps
+      ? innerRefProps
+      : void 0;
+  const innerRefFn =
+    typeof innerRefProps === 'function' && !('current' in innerRefProps)
+      ? innerRefProps
+      : void 0;
   const scrollRef = innerRef ?? animatedRef;
   const scrollHandler = useScrollViewOffset(scrollRef);
   const scrollSize = useSharedValue(0);
@@ -72,10 +80,13 @@ export function AutoScrollScrollView(
     height: 0,
   });
 
-  const onRef = useCallback((ref: Animated.ScrollView) => {
-    innerRefFn?.(ref)
-    scrollRef.current = ref
-  }, [innerRefFn, scrollRef])
+  const onRef = useCallback(
+    (ref: Animated.ScrollView) => {
+      innerRefFn?.(ref);
+      scrollRef(ref);
+    },
+    [innerRefFn, scrollRef]
+  );
 
   const needScroll = useCallback<AutoScrollHandler['needScroll']>(
     (scrollBy) => {
